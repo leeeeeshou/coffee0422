@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="databoard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+    <div class="page">
+  <div class="box div1">
+    <div class="dataTitle textCenter">最大值</div>
+    <div class="dataSubTitle textCenter">max</div>
+    <div class="dataNumber flexCenter" id="MaxValue">35.6</div>
+  </div>
+  <div class="box div2">
+    <div class="dataTitle textCenter">最小值</div>
+    <div class="dataSubTitle textCenter">min</div>
+    <div class="dataNumber flexCenter" id="MinValue">25.6</div>
+  </div>
+  <div class="box div3 flexCenter">
+    <span>Data-Title</span>
+    <h2 class="textCenter">台北市失業教育程度類別區分表
+    </h2>
+        <hr>
+  </div>
+  <div class="box div4">
+    <div class="iconArea flexCenter bd"></div> 
+    <div class="dataSubTitle textCenter" id="CnEduction">大學</div>
+    <div class="icondesc flexCenter" id="EnEduction">COLLEGE</div>
+  </div>
+  <div class="box div5">
+    <canvas id="myChart"></canvas>
+  </div>
+  <div class="box div6">
+    <span>圓餅圖</span>
+    <canvas id="myChartpie"></canvas>
+  </div>
+  <div class="box div7">時間</div>
+  <div class="box div8">數值</div>
+  <div class="box div9 flexCenter">
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">研究所</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">大學</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">專科</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">高中</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">高職</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">國中[初職]</p></div>
+    <div class="selectBox"><div class="selectIcon"></div><p class="textCenter">國小以下</p></div>
+  </div>
+  <div class="box div10">
+    <div class="dataTitle textCenter">標準差</div>
+    <div class="dataSubTitle textCenter">Standard Deviation</div>
+    <span class="dataNumber flexCenter" id="StandardValue"></span>
+  </div>
+  <div class="box div11">年成長數<span class="midSizeNumber" id="AvgAnnualGrowthValue"></span></div>
+  <div class="box div12"><canvas id="myChartBar"></canvas></div>
+  <div class="box div13">中位數<span class="midSizeNumber" id="MedianValue"></span></div>
+  <div class="box div14">平均數<span class="midSizeNumber" id="AvgValue"></span></div>
+  <div class="div15">資料來源:
+  https://codepen.io/iqtzhkrw-the-vuer/pen/VYYgRoe?editors=1100
+  </div>
+</div>
+</body>
+</html>
+<script>
+  /*定義資料及圖表*/
+  let myChart,myChart2,myChart3;
+  let processedData;
+ fetch('失業的教育程度類別.json')
+            .then(response => response.json())
+            .then(data => {
+                // 處理讀取到的資料
+                processedData = processData(data);
+                // 繪製圖表
+                eductionData('大學')
+                console.log(processedData)
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        //定義資料內容
+        function processData(data) {
+            const labels = data.map(item => item['統計期']);  // 取得年份作為標籤
+
+            const researchInstitute = data.map(item => item['失業率/研究所[%]']);
+            const university = data.map(item => item['失業率/大學[%]']);
+            const juniorCollege = data.map(item => item['失業率/專科[%]']);
+            const seniorHigh = data.map(item => item['失業率/高中[%]']);
+            const vocationalHigh = data.map(item => item['失業率/高職[%]']);
+            const juniorHigh = data.map(item => item['失業率/國中[初職][%]']);
+            const elementarySchool = data.map(item => item['失業率/國小以下[%]']);
+
+            return {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '研究所',
+                        data: researchInstitute,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '大學',
+                        data: university,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '專科',
+                        data: juniorCollege,
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '高中',
+                        data: seniorHigh,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '高職',
+                        data: vocationalHigh,
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                        borderWidth: 1
+                    },
+                     {
+                        label: '國中[初職]',
+                        data: juniorHigh,
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '國小以下',
+                        data: elementarySchool,
+                        borderColor: 'rgba(199, 134, 150, 1)',
+                        backgroundColor: 'rgba(199, 134, 150, 0.1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+        }
+//把資料固定在某個學歷
+      const eductionData=(degreen)=> {
+      filteredDatasets=processedData.datasets.filter(item =>
+            item.label.includes(degreen)
+      )
+    //更改圖表內容
+    const newChartData = {
+        labels: processedData.labels,
+        datasets: filteredDatasets
+    };
+    renderChart(newChartData);
+   renderChartpie(newChartData)
+   renderChartBar(newChartData)
+
+
+    // 中文學歷對應英文學歷名稱
+    let enText = '';
+    switch (degreen) {
+        case '研究所':
+            enText = 'Graduate School';
+            break;
+        case '大學':
+            enText = 'College';
+            break;
+        case '專科':
+            enText = 'Junior College';
+            break;
+        case '高中':
+            enText = 'Senior High School';
+            break;
+        case '高職':
+            enText = 'Vocational High School';
+            break;
+        case '國中[初職]':
+            enText = 'Junior High School';
+            break;
+        case '國小以下':
+            enText = 'Elementary and Below';
+            break;
+        default:
+            enText = 'Unknown';
+    }
+
+
+   const values = newChartData.datasets[0].data.map(Number);
+   
+    document.getElementById('MaxValue').innerText = Math.max(...values);
+    document.getElementById('MinValue').innerText =  Math.min(...values);
+    document.getElementById('AvgValue').innerText=avgvalue(values).toFixed(2)
+    document.getElementById('StandardValue').innerText=StandardDeviation(values).toFixed(2)
+    document.getElementById('MedianValue').innerText=medianValue(values).toFixed(2)
+    document.getElementById('AvgAnnualGrowthValue').innerText=averageAnnualGrowth(values).toFixed(2)
+
+
+    document.getElementById('CnEduction').innerText=degreen
+    document.getElementById('EnEduction').innerText=enText
+    };
+
+
+
+
+
+//折線圖設定
+function renderChart(data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    if (myChart) {
+        myChart.destroy();
+    }
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false  
+                    },
+                    grid: {
+                        drawTicks: false,  
+                        drawOnChartArea: true  
+                    }
+                },
+                y: {
+                    title: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false
+                    },
+                    grid: {
+                        drawTicks: false,
+                        drawOnChartArea: true
+                    },
+                    min: 0
+                }
+            }
+        }
+    });
+}
+
+
+//圓餅圖設定
+function renderChartpie(data) {
+    const ctxpie = document.getElementById('myChartpie').getContext('2d');
+
+    if (myChart2) {
+        myChart2.destroy();
+    }
+
+    // 只會有一筆 dataset（例如：'大學'）
+    const dataset = data.datasets[0];  
+    const pieLabels = data.labels;     // 各年度
+    const pieData = dataset.data;      // 該學歷每年的失業率
+
+
+    // 定義 baseColor
+const baseColor = dataset.borderColor;
+
+  // baseColor明度變化
+  const backgroundColor = pieLabels.map((_, i) => {
+    const alpha = 0.3 + (i / pieLabels.length) * 0.7; // 透明度變化
+    return baseColor.replace('1)', `${alpha})`); // 替換 rgba 的透明度
+});
+
+    myChart2 = new Chart(ctxpie, {
+        type: 'pie',
+        data: {
+            labels: pieLabels,
+            datasets: [{
+                data: pieData,
+                backgroundColor: backgroundColor,
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display:false,
+                    position: 'right'
+                },
+                title: {
+                    display: false,
+                    text: `${dataset.label} 各年份失業率圓餅圖`
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.raw;
+                            return `${context.label}：${val}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+//長條圖設定
+function renderChartBar(data) {
+    const ctxBar = document.getElementById('myChartBar').getContext('2d');
+    if (myChart3) {
+        myChart3.destroy();
+    }
+    myChart3 = new Chart(ctxBar, {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false  
+                    },
+                    grid: {
+                        drawTicks: false,  
+                        drawOnChartArea: true  
+                    }
+                },
+                y: {
+                    title: {
+                        display: false
+                    },
+                    ticks: {
+                        display: false
+                    },
+                    grid: {
+                        drawTicks: false,
+                        drawOnChartArea: true
+                    },
+                    min: 0
+                }
+            }
+        }
+    });
+}
+
+
+
+
+/*平均值設定*/
+    const avgvalue=(arr)=> {
+      const sum = arr.reduce((acc, val) => acc + val, 0);
+      return sum / arr.length;
+    }
+/*標準差設定*/    
+    const StandardDeviation=(arr)=> {
+      const avg = avgvalue(arr);
+      const squareDiffs = arr.map(val => (val - avg) ** 2);
+      const avgSquareDiff = squareDiffs.reduce((acc, val) => acc + val, 0) / arr.length; 
+      return Math.sqrt(avgSquareDiff);
+    }
+
+/*中位數設定*/ 
+    const medianValue = (arr) => {
+      const sorted = arr.slice().sort((a, b) => a - b); 
+      const mid = Math.floor(sorted.length / 2);        
+
+      if (sorted.length % 2 !== 0) {
+          return sorted[mid];
+      } else {
+          return (sorted[mid - 1] + sorted[mid]) / 2;
+      }
+    };
+
+/*年成長數設定*/
+    const averageAnnualGrowth = (arr) => {
+      const growths = [];
+      for (let i = 1; i < arr.length; i++) {
+          growths.push(arr[i] - arr[i - 1]);
+      }
+
+      const sum = growths.reduce((acc, val) => acc + val, 0);
+      return sum / growths.length;
+    };
+
+
+
+/*更改組群*/
+const selectBoxes =document.querySelectorAll('.selectBox')
+selectBoxes.forEach(box => {
+    box.addEventListener('click', () => {
+        const degree = box.querySelector('p').innerText;
+        eductionData(degree);
+    });
+});
+</script>

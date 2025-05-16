@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>失業率分析圖表</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>歷年失業率分析 <input type="text" id="inputEducation"></input></h2>
+
+    <div class="canvas-box">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="canvas-box">
+        <canvas id="myChart2"></canvas>
+    </div>
+<div class="row-bar">
+    <div class="row-box" >
+        <h2>平均值</h2>
+        <h2 id="average_value">132</h2>
+    </div>
+    <div class="row-box" >
+        <h2>標準差</h2>
+        <h2 id="variance"></h2>
+
+    </div>
+    <div class="row-box" id="median">
+        <h2>中位數</h2>
+
+    </div>
+</div>
+
+
+    <script>
+//設定欄位
+    const averageValue =document.getElementById('average_value')
+    const variance =document.getElementById('variance')
+    const median =document.getElementById('median')
+
+        let averageValueNumber,varianceNumber,allValues;
+
+        //平均值的函式
+        function calculateAverage(arr) {
+            const sum = arr.reduce((acc, val) => acc + val, 0);
+            return sum / arr.length;
+        }
+        //算標準差
+        function calculateStandardDeviation(arr) {
+            const avg = calculateAverage(arr);
+            const squareDiffs = arr.map(val => (val - avg) ** 2);
+            const avgSquareDiff = squareDiffs.reduce((acc, val) => acc + val, 0) / arr.length; // 母體標準差
+            return Math.sqrt(avgSquareDiff);
+        }
+
+        // 初始化圖表
+        let myChart,myChart2;
+        let processedData;
+        // 從 JSON 檔案讀取資料
+        fetch('失業的教育程度類別.json')
+            .then(response => response.json())
+            .then(data => {
+                // 處理讀取到的資料
+                processedData = processData(data);
+                // 繪製圖表
+                renderChart(processedData);
+                renderChart2(processedData)
+                console.log(processedData)
+
+                //算平均值
+               allValues = processedData.datasets.flatMap(dataset => dataset.data);
+
+
+                averageValueNumber = calculateAverage(allValues);
+                varianceNumber =calculateStandardDeviation(allValues)
+                averageValue.innerText=averageValueNumber.toFixed(2)
+                variance.innerText=varianceNumber.toFixed(2)
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        // 資料處理函式
+        function processData(data) {
+            const labels = data.map(item => item['統計期']);  // 取得年份作為標籤
+
+            // 取得各教育程度的失業率資料
+            const researchInstitute = data.map(item => item['失業率/研究所[%]']);
+            const university = data.map(item => item['失業率/大學[%]']);
+            const juniorCollege = data.map(item => item['失業率/專科[%]']);
+            const seniorHigh = data.map(item => item['失業率/高中[%]']);
+            const vocationalHigh = data.map(item => item['失業率/高職[%]']);
+            const juniorHigh = data.map(item => item['失業率/國中[初職][%]']);
+            const elementarySchool = data.map(item => item['失業率/國小以下[%]']);
+
+            return {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '研究所',
+                        data: researchInstitute,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '大學',
+                        data: university,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '專科',
+                        data: juniorCollege,
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '高中',
+                        data: seniorHigh,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '高職',
+                        data: vocationalHigh,
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                        borderWidth: 1
+                    },
+                     {
+                        label: '國中[初職]',
+                        data: juniorHigh,
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '國小以下',
+                        data: elementarySchool,
+                        borderColor: 'rgba(199, 134, 150, 1)',
+                        backgroundColor: 'rgba(199, 134, 150, 0.1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+        }
+
+        // 繪製圖表函式
+        function renderChart(data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if(myChart){myChart.destroy()}
+            myChart = new Chart(ctx, {
+                type: 'line',  // 使用折線圖
+                data: data,
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: '歷年不同教育程度別之失業率'
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '年份'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '失業率 (%)'
+                            },
+                            min: 0  // 設定 y 軸最小值為 0
+                        }
+                    },
+                    // 加入互動功能
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    }
+                }
+            });
+        }
+
+
+        /*長條圖*/
+         function renderChart2(data) {
+            const ctx2 = document.getElementById('myChart2').getContext('2d');
+            if(myChart2){myChart2.destroy()}
+            myChart2 = new Chart(ctx2, {
+                type: 'bar',  // 使用折線圖
+                data: data,
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: '歷年不同教育程度別之失業率'
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '年份'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '失業率 (%)'
+                            },
+                            min: 0  // 設定 y 軸最小值為 0
+                        }
+                    },
+                    // 加入互動功能
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    }
+                }
+            });
+        }
+
+
+    const inputEducation=document.getElementById('inputEducation')   
+
+        inputEducation.addEventListener('input', function() {
+       const keyword = inputEducation.value.trim();//找出輸入的字
+        
+       let filteredDatasets=[]
+            if(keyword){
+                filteredDatasets=processedData.datasets.filter(item =>
+            item.label.includes(keyword)
+        )
+
+            }else{
+                filteredDatasets=processedData.datasets
+            }
+
+    const newChartData = {
+        labels: processedData.labels,
+        datasets: filteredDatasets
+    };
+    allValues = filteredDatasets.flatMap(dataset => dataset.data)
+
+    renderChart(newChartData);
+    renderChart2(newChartData)
+
+        averageValueNumber = calculateAverage(allValues);
+        varianceNumber =calculateStandardDeviation(allValues)
+        averageValue.innerText=averageValueNumber.toFixed(2)
+        variance.innerText=varianceNumber.toFixed(2)
+
+    });
+        
+        
+        
+
+
+    </script>
+</body>
+</html>
+
+<style>
+body{
+    width: 100vw;
+    height: fit-content;
+    padding-top: 15vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.canvas-box{
+    width: 60vw;
+    height: fit-content;
+    border: 1px solid #000;
+    padding: 5px;
+    margin: 5px;
+}
+canvas{
+
+width: 100%;
+}
+h2{
+    position: absolute;
+    top: 30px;
+}
+.row-bar{
+    width: 300px;
+    height: 80vh;
+    position: fixed;
+    right: 0;
+    top: 10vh;
+}
+
+.row-box{
+    position: relative;
+    width: 100%;
+    height: 30%;
+    margin-top: 5%;
+    border: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.row-box h2{
+    position: relative;
+    font-size: 2rem;
+    margin-top: -0.5rem;
+}
+</style>

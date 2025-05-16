@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <h2>資料測試</h2>
+  
+  <!-- 新增輸入框來篩選區域 -->
+  <label for="areaInput">請輸入區域：</label>
+  <input type="text" id="areaInput" placeholder="例如：中西區" />
+
+  <div class="box">
+      <canvas id="myChart"></canvas>
+  </div>
+</body>
+</html>
+
+<style>
+    body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .box {
+        width: 50%;
+        height: fit-content;
+        border: 1px solid #000;
+    }
+    h2 {
+        margin-top: 20px;
+    }
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+</style>
+
+<script>
+    // 初始化圖表資料
+    let chartData = [];
+    
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => {
+        chartData = data;
+        // 初始化圖表
+        updateChart(chartData);
+      });
+
+    // 用來更新圓餅圖的函數
+    function updateChart(data) {
+        const areaCount = {};
+        data.forEach(item => {
+          const area = item.area;
+          areaCount[area] = (areaCount[area] || 0) + 1;
+        });
+
+        const labels = Object.keys(areaCount);
+        const values = Object.values(areaCount);
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if (window.chartInstance) {
+          // 如果圖表已經存在，則銷毀舊的圖表
+          window.chartInstance.destroy();
+        }
+
+        window.chartInstance = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '各區域搶修件數',
+              data: values,
+              backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+              ],
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'right'
+              },
+              title: {
+                display: true,
+                text: '各區域搶修件數圓餅圖'
+              }
+            }
+          }
+        });
+    }
+
+    // 監聽用戶輸入的區域並過濾資料
+    document.getElementById('areaInput').addEventListener('input', function(event) {
+        const searchTerm = event.target.value.trim().toLowerCase();
+        
+       
+    const filteredData = chartData.filter(item => {
+        // 檢查 item.area 是否存在，並且將其轉為小寫後再進行匹配
+        return item.area && item.area.toLowerCase().includes(searchTerm);
+    });
+        
+        // 更新圖表顯示
+        updateChart(filteredData);
+    });
+</script>
