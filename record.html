@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 拾光月記</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 奶茶色系調色盤 */
+            --bg-color: #FDFBF7;         /* 米白背景 */
+            --primary-color: #D4C1A5;    /* 奶茶色 */
+            --secondary-color: #E8DCC8;  /* 淺奶茶 */
+            --accent-color: #9C8163;     /* 深咖啡文字 */
+            --highlight-pink: #F4C2C2;   /* 亮色點綴 - 柔粉 */
+            --highlight-green: #B7D1A2;  /* 亮色點綴 - 酪梨綠 */
+            --card-bg: #FFFFFF;
+            --font-main: 'Quicksand', 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            background-image: radial-gradient(#D4C1A5 1px, transparent 1px);
+            background-size: 20px 20px; /* 點點背景 */
+        }
+
+        /* 標題區 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 0px var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            background-color: var(--highlight-green);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* 格線佈局 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding-bottom: 80px; /* 為底部按鈕留空間 */
+        }
+
+        /* 月份卡片 */
+        .month-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(156, 129, 99, 0.1);
+            border: 3px solid var(--secondary-color);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .month-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .month-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .month-tag {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* 輸入欄位樣式 */
+        input[type="text"], textarea {
+            width: 100%;
+            border: 2px solid #EEE;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-family: var(--font-main);
+            box-sizing: border-box; /* 確保padding不影響寬度 */
+            background: #FAFAFA;
+            color: var(--accent-color);
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--highlight-pink);
+            background: #FFF;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* 圖片上傳區 */
+        .img-upload-area {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background-color: #F7F5F0;
+            border: 2px dashed var(--primary-color);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .img-upload-area:hover {
+            background-color: #FFF;
+            border-color: var(--highlight-pink);
+        }
+
+        .img-upload-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* 預設隱藏 */
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #AAA;
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        /* 底部控制列 */
+        .control-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-download {
+            background-color: var(--highlight-pink);
+            color: #FFF;
+        }
+        
+        .btn-download:hover { background-color: #ff9e9e; }
+
+        .btn-pdf {
+            background-color: var(--primary-color);
+            color: #FFF;
+        }
+
+        .btn-pdf:hover { background-color: #c4aa88; }
+
+        /* 隱藏元素 (匯出時用) */
+        .no-export {
+            z-index: 1;
+            /* 用於匯出時隱藏按鈕等 */
+        }
+
+        /* 引導 Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(93, 64, 55, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #FFF;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid var(--primary-color);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-content h2 {
+            color: var(--accent-color);
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .step-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--highlight-pink);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <h1>2025 拾光月記</h1>
+        <div class="subtitle">✨ 紀錄每一個閃閃發亮的日子 ✨</div>
+    </header>
+
+    <div class="container" id="journal-container">
+        </div>
+
+    <div class="control-bar data-html2canvas-ignore">
+        <button class="btn btn-download" onclick="exportToImage()">📸 下載長圖 (JPG)</button>
+        <button class="btn btn-pdf" onclick="exportToPDF()">📄 匯出 PDF</button>
+        <button class="btn" style="background:#ddd; color:#555;" onclick="clearData()">🗑️ 清除重寫</button>
+    </div>
+
+    <div class="modal-overlay" id="intro-modal">
+        <div class="modal-content">
+            <h2>👋 歡迎來到您的 2025 月記！</h2>
+            <p style="text-align: center; margin-bottom: 20px;">這裡沒有複雜的操作，只有溫暖的紀錄。</p>
+            
+            <p><span class="step-icon">1</span> <b>寫下標題</b>：幫這個月下一個主題。</p>
+            <p><span class="step-icon">2</span> <b>上傳照片</b>：點擊虛線框框，放上一張代表照。</p>
+            <p><span class="step-icon">3</span> <b>自動保存</b>：不用擔心，打字後我們會自動幫您暫存在瀏覽器裡。</p>
+            <p><span class="step-icon">4</span> <b>一鍵匯出</b>：年底或隨時，點擊下方按鈕即可打包帶走。</p>
+            
+            <button class="btn btn-download" style="margin-top: 20px;" onclick="closeModal()">開始紀錄 ✏️</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const container = document.getElementById('journal-container');
+        const months = [
+            "January 1月", "February 2月", "March 3月", "April 4月", 
+            "May 5月", "June 6月", "July 7月", "August 8月", 
+            "September 9月", "October 10月", "November 11月", "December 12月"
+        ];
+
+        // 1. 初始化頁面：產生12個月份卡片
+        function initPage() {
+            months.forEach((month, index) => {
+                const monthIndex = index + 1;
+                const card = document.createElement('div');
+                card.className = 'month-card';
+                card.innerHTML = `
+                    <div class="month-header">
+                        <span class="month-tag">${month}</span>
+                        <span style="font-size: 1.5rem;">🌸</span>
+                    </div>
+                    <input type="text" id="title-${monthIndex}" placeholder="輸入這個月的主題..." oninput="saveData(${monthIndex})">
+                    <textarea id="content-${monthIndex}" placeholder="發生了什麼有趣的事呢？..." oninput="saveData(${monthIndex})"></textarea>
+                    
+                    <div class="img-upload-area" onclick="triggerUpload(${monthIndex})">
+                        <div class="upload-placeholder" id="placeholder-${monthIndex}">
+                            <div style="font-size: 2rem;">📷</div>
+                            <div>點擊上傳照片</div>
+                        </div>
+                        <img id="preview-${monthIndex}" alt="Photo">
+                        <input type="file" class="upload-input" id="file-${monthIndex}" accept="image/*" onchange="handleImage(this, ${monthIndex})">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            loadData(); // 載入已儲存的資料
+        }
+
+        // 2. 引導視窗控制
+        function closeModal() {
+            document.getElementById('intro-modal').style.display = 'none';
+        }
+
+        // 3. 圖片上傳邏輯
+        function triggerUpload(index) {
+            document.getElementById(`file-${index}`).click();
+        }
+
+        function handleImage(input, index) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(`preview-${index}`);
+                    const placeholder = document.getElementById(`placeholder-${index}`);
+                    
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    
+                    // 儲存圖片數據 (Base64) 到 LocalStorage
+                    // 注意：localStorage 有大小限制，圖片太大可能會失敗，這裡是簡易實作
+                    try {
+                        localStorage.setItem(`journal-img-${index}`, e.target.result);
+                    } catch (e) {
+                        alert("照片太大了，瀏覽器存不下 😢 建議匯出後再清除資料。");
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 4. 資料儲存邏輯 (LocalStorage)
+        function saveData(index) {
+            const title = document.getElementById(`title-${index}`).value;
+            const content = document.getElementById(`content-${index}`).value;
+            localStorage.setItem(`journal-title-${index}`, title);
+            localStorage.setItem(`journal-content-${index}`, content);
+        }
+
+        // 5. 資料讀取邏輯
+        function loadData() {
+            for (let i = 1; i <= 12; i++) {
+                // 讀文字
+                if(localStorage.getItem(`journal-title-${i}`)) {
+                    document.getElementById(`title-${i}`).value = localStorage.getItem(`journal-title-${i}`);
+                }
+                if(localStorage.getItem(`journal-content-${i}`)) {
+                    document.getElementById(`content-${i}`).value = localStorage.getItem(`journal-content-${i}`);
+                }
+                // 讀圖片
+                const savedImg = localStorage.getItem(`journal-img-${i}`);
+                if (savedImg) {
+                    const img = document.getElementById(`preview-${i}`);
+                    const placeholder = document.getElementById(`placeholder-${i}`);
+                    img.src = savedImg;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("確定要清除所有紀錄嗎？這無法復原喔！")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // 6. 匯出圖片 (JPG)
+        function exportToImage() {
+            window.scrollTo(0, 0); // 先滾動到頂部確保渲染正確
+            const element = document.body;
+            
+            // 隱藏按鈕列
+            document.querySelector('.control-bar').style.display = 'none';
+
+            html2canvas(element, {
+                useCORS: true,
+                scale: 2, // 提高解析度
+                backgroundColor: "#FDFBF7" 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '2025_My_Journal.jpg';
+                link.href = canvas.toDataURL("image/jpeg", 0.9);
+                link.click();
+                
+                // 恢復按鈕列
+                document.querySelector('.control-bar').style.display = 'flex';
+            });
+        }
+
+        // 7. 匯出 PDF
+        function exportToPDF() {
+            window.scrollTo(0, 0);
+            const { jsPDF } = window.jspdf;
+            const element = document.body;
+            document.querySelector('.control-bar').style.display = 'none';
+
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: "#FDFBF7"
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // 計算 PDF 尺寸 (以 A4 寬度為基準，高度自動延伸)
+                const pdfWidth = 210; // A4 寬度 mm
+                const pageHeight = 297; // A4 高度 mm
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                
+                const ratio = imgWidth / pdfWidth;
+                const pdfHeight = imgHeight / ratio;
+
+                const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('2025_My_Journal.pdf');
+
+                document.querySelector('.control-bar').style.display = 'flex';
+            });
+        }
+
+        // 啟動
+        initPage();
+        
+        // 檢查是否是第一次訪問 (簡易判斷)
+        if(localStorage.getItem('visited')) {
+            document.getElementById('intro-modal').style.display = 'none';
+        } else {
+            localStorage.setItem('visited', 'true');
+        }
+
+    </script>
+</body>
+</html>
